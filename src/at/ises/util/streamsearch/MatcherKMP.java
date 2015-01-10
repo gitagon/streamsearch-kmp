@@ -28,13 +28,15 @@ package at.ises.util.streamsearch;
  * In: SIAM Journal of Computing. 6, 2, 323-350 (1977)
  * @author @gitagon
  */
-public class MatcherKMP extends MatcherBase implements StreamBufferMatcher
+public class MatcherKMP extends MatcherBase implements Matcher
 {
 	final int[] tab;  // prefix table for the pattern
+	private int patpos;   // current position in pattern
 	private MatcherKMP(byte[] w) 
 	{
 		super(w);
 		tab = new int[w.length+1];
+		patpos = 0;
 	}
 	
 	
@@ -59,13 +61,23 @@ public class MatcherKMP extends MatcherBase implements StreamBufferMatcher
 	}
 	
 	
-	public static StreamBufferMatcher compile(byte[] patternW)
+	public static Matcher compile(byte[] patternW)
 	{
 		MatcherKMP result = new MatcherKMP(patternW);
 		result.compile();
 		return result;
 	}
 	
+	public void reset()
+	{
+		patpos = 0;
+	}
+	
+	protected void setState(int posInTxt, int posInPat)
+	{
+		pos = posInTxt;
+		patpos = posInPat;
+	}
 	
 	/**
 	 * Only looks for matches in the input buffer starting at getIndex(),
@@ -91,10 +103,11 @@ public class MatcherKMP extends MatcherBase implements StreamBufferMatcher
 //		
 //		output reported via matchEvent():
 //		all matches of pat in txt
-		int k = pos; // points at current position in text
-		int j = 0;   // points at current position in pattern
+		int k = pos; 	// points at current position in text
+		int j = patpos; // points at current position in pattern
 		
-		loop:
+		loop: 
+		{
 		while (k < n)   // assert not at end of buffer
 		{
 			while (j >= 0 && txt[k] != pat[j]) // move pattern until
@@ -108,11 +121,14 @@ public class MatcherKMP extends MatcherBase implements StreamBufferMatcher
 		    if (j == m)           // if at end of pattern
 		    {                     // report a match which started
 		       matchEvent(k - m); // m bytes earlier.
+		       setState(k-m, j);  // save state
 		       break loop;
 //		       j = tab[j];        // move pattern if using a non-breaking loop
 		    
 		    }
 		}
+		setState(k, j); // save state
+		} // end of loop labelled block
 	}
 
 }

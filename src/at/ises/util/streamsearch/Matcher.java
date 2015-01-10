@@ -21,7 +21,7 @@ package at.ises.util.streamsearch;
  * @author @gitagon
  *
  */
-public interface StreamBufferMatcher {
+public interface Matcher {
 
 	/** Only looks for matches in the input buffer starting at getIndex(),
 	 * without reading from the buffered stream. 
@@ -54,6 +54,10 @@ public interface StreamBufferMatcher {
 
 	/** Sets the index to start search at; 
 	 * returns the same object for method chaining. */
-	public abstract StreamBufferMatcher setIndex(int index);
+	public abstract Matcher setIndex(int index);
+	
+	/** Resets any internal matcher state so match() would re-start matching
+     *	from the beginning of the pattern, starting in buffer at get_index(). */
+	public abstract void reset();
 
 }

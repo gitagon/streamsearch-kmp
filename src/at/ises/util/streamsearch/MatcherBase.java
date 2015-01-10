@@ -21,7 +21,7 @@ package at.ises.util.streamsearch;
  * @author @gitagon
  *
  */
-public abstract class MatcherBase implements StreamBufferMatcher {
+public abstract class MatcherBase implements Matcher {
 
 	protected final byte[] pat;
 	protected int pos;
@@ -38,7 +38,7 @@ public abstract class MatcherBase implements StreamBufferMatcher {
 	/** Sets the index to start search at; 
 	 * returns the same object for method chaining.	 */
 	@Override
-	public StreamBufferMatcher setIndex(int index) { pos = index; return this; }
+	public Matcher setIndex(int index) { pos = index; return this; }
 
 	@Override
 	public int getIndex() { return pos; }
@@ -63,7 +63,7 @@ public abstract class MatcherBase implements StreamBufferMatcher {
 			throw new IndexOutOfBoundsException("position not in buffer");
 		
 		setFound(false);
-		for(boolean repeat=true; repeat;)
+		while(true)
 		{
 			match(input);
 			
